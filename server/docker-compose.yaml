@@ -1,0 +1,39 @@
+version: '3.5'
+
+networks:
+  afs_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.150.0/24
+
+services:
+  afs_runtime_package:
+    build:
+      context: ./runtime_package
+      dockerfile: Dockerfile.runtime_package
+    image: afs_runtime_package:1.0
+    entrypoint: "sh -c"
+    command: "exit 0"
+
+  afs-app:
+    image: afs_runtime_package:1.0
+    restart: unless-stopped
+
+    container_name: afs-app
+    networks:
+      afs_net:
+        ipv4_address: 192.168.150.250
+    ports:
+      - 5025:5025
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "5"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /opt/afs/src:/opt/afs/src
+    command: >
+      sh -c
+      "sudo chown -R 1000:1000 /opt/afs && cd /opt/afs && sudo python /opt/afs/src/runserver.py"

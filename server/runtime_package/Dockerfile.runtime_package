@@ -1,0 +1,55 @@
+FROM    python:3.8.10-alpine3.13
+LABEL   maintainer="test@demo.com"
+
+RUN pip install requests virtualenv
+RUN mkdir -p /opt/afs
+
+COPY requirements.txt /opt
+
+RUN set -ex \
+    && apk add --no-cache \
+    sudo \
+    curl \
+    postgresql-libs \
+    openssl \
+    libjpeg \
+    tiff-dev jpeg-dev openjpeg-dev zlib-dev freetype-dev lcms2-dev \
+    libwebp-dev tcl-dev tk-dev harfbuzz-dev fribidi-dev libimagequant-dev \
+    libxcb-dev libpng-dev \
+    unixodbc-dev
+
+#Download the desired package(s)
+# RUN curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.8.1.1-1_amd64.apk
+# RUN curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.8.1.1-1_amd64.apk
+
+# RUN set -ex \
+#     && apk add --no-cache\
+#     --allow-untrusted msodbcsql17_17.8.1.1-1_amd64.apk \
+#     --allow-untrusted mssql-tools_17.8.1.1-1_amd64.apk
+
+# RUN sudo ln -s /opt/mssql-tools/bin/* /usr/local/bin/
+
+#For python-ldap
+RUN apk add openldap-dev
+
+RUN set -ex \
+    # && apk add --no-cache --virtual .fetch-deps \
+    # gcc \
+    # build-base \
+    # linux-headers \
+    # musl-dev \
+    # postgresql-dev \
+    # libffi-dev \
+    # cargo \
+    # \
+    && pip install -r /opt/requirements.txt \
+    #&& apk del .fetch-deps \
+    && adduser -u 1000 -s /bin/ash -D cy cy \
+    && echo "cy ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
+    && chown -R cy:cy /opt/afs
+
+WORKDIR /opt/afs
+
+USER cy
+
+CMD ["/bin/sh"]
