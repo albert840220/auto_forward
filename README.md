@@ -2,13 +2,11 @@
 ```
 This is a email Auto Forwarding Service(AFS)
 * Parse email
-    Determine the decoding method according to Content-Type.
+    Determine the decoding method according to Content-Type.(Currently supports text/plain, text/html)
 * Send email
     Use SMTP
-* Email history
-    Only log IP, stat_code, From, to, Subject, Content of the received email
-
-
+*  Email log
+    Record the IP, From, To, and subject of the email received
 ```
 
 ### Project structure
@@ -24,7 +22,7 @@ This is a email Auto Forwarding Service(AFS)
    |
    |-- tool/
    |    |-- check_afs.py                   # Check whether the service is normal, currently placed in 
-   |                                       # placed in the crontab of 192.168.55.25
+   |                                       # placed in the crontab of 192.168.55.26
    |
    |-- docker-compose.yaml                 # Docker-compose use
    |
